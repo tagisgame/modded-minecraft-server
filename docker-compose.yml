@@ -1,0 +1,80 @@
+version: "4.31.1"
+name: minecraft-modded-server
+
+services:
+  mcserver:
+    build: 
+      dockerfile: ./Dockerfile.txt
+    image: minecraft-server-j21jdk-w-libxtsts6:latest
+    tty: true
+    stdin_open: true
+    ports:
+      - "25565:25565"
+      - "24454:24454/udp"
+    environment:
+      # mods automatically obtained from CurseForge
+      MOD_PLATFORM: AUTO_CURSEFORGE
+      CF_API_KEY: ${CF_API_KEY}
+      CF_PAGE_URL: https://www.curseforge.com/minecraft/modpacks/bigchadguys-plus/files/5391744
+      CF_EXCLUDE_MODS: 281715, 682371, 435044, 904356, 679177, 511770, 334853, 447673, 667377, 407206, 495267, 248787, 985426, 858542, 543661, 848022, 409301, 367706, 527334, 852662, 511733, 459496, 272515, 849519, 574741, 534835, 511319, 832644
+      DISPLAY: 0.0
+      MEMORY: 8G
+      GUI: false
+      COPY_CONFIG_DEST: "/data/config"
+      SYNC_SKIP_NEWER_IN_DESTINATION: false
+      COPY_MODS_DEST: "/data/mods"
+      # server properties
+      SERVER_PORT: 25565
+      EULA: true
+      ONLINE_MODE: true
+      ICON: "/properties/icon.png"
+      MOTD: "\u00A72▓▒░ \u00A7a⇒ \u00A7f\u00A7lWakacyjna Faza na MC! \u00A7a⇐ \u00A72░▒▓\u00A7r\n\u00A7d▓▒░ \u00A75⇒ \u00A74g\u00A7ca\u00A76y \u00A7es\u00A7ae\u00A72x \u00A73h\u00A79e\u00A71r\u00A75e \u00A78\u00A7o(possibly) \u00A75⇐ \u00A7d░▒▓"
+      SERVER_PROPERTIES_ESCAPE_UNICODE: true
+      ENABLE_WHITELIST: true
+      WHITELIST_FILE: /properties/whitelist.json
+      OPS_FILE: /properties/ops.json
+      EXISTING_WHITELIST_FILE: SYNC_FILE_MERGE_LIST
+      EXISTING_OPS_FILE: SYNC_FILE_MERGE_LIST
+      # server config
+      RCON_CMDS_STARTUP:  |-
+        gamerule commandBlockOutput false
+        gamerule disableElytraMovementCheck true
+        gamerule doFireTick false
+        gamerule mobGriefing false
+        gamerule playersSleepingPercentage 0
+        chunky world minecraft:overworld
+        chunky center 0 0
+        chunky shape square
+        chunky radius 50000
+        chunky start
+        chunky world minecraft:the_nether
+        chunky center 0 0
+        chunky shape square
+        chunky radius 6250
+        chunky start
+        chunky world minecraft:the_end
+        chunky center 0 0
+        chunky shape square
+        chunky radius 50000
+        chunky start
+        chunky world spectrum:deeper_down
+        chunky center 0 0
+        chunky shape square
+        chunky radius 25000
+        chunky start
+        chunky world deeperdarker:otherside
+        chunky center 0 0
+        chunky shape square
+        chunky radius 25000
+        chunky start
+        chunky continue
+      RCON_CMDS_FIRST_CONNECT: |-
+        chunky pause
+      RCON_CMDS_LAST_DISCONNECT: |-
+        chunky continue
+    volumes:
+      - ./serverdata:/data
+      - ./config:/config
+      - ./properties:/properties
+      - ./mods:/mods
+    restart: unless-stopped
